@@ -4,7 +4,7 @@ import java.util.Map;
 public class MinimumWindowSubstring {
     // driver code
     public static void main(String[] args) {
-        System.out.println(minWindow("ADOBECODEBANC", "ABC")); // expected output: BANC
+        System.out.println(optiMinWindow("ADOBECODEBANC", "ABC")); // expected output: BANC
     }
 
     // solution code
@@ -61,5 +61,38 @@ public class MinimumWindowSubstring {
         }
         
         return result[0] == -1 ? "" : s.substring(result[1], result[2] + 1);
+    }
+
+    // optmized solution using Array instead of HashMap
+    public static String optiMinWindow(String s, String t) {
+        int tElements[] = new int[123]; //to track a-z & A-Z in unicode (65-90 and 97-122)
+        for(char c:t.toCharArray()) {
+            tElements[c]++;
+        }
+
+        char[] S = s.toCharArray();
+        int minLength = Integer.MAX_VALUE, start = 0;
+        int find = t.length(); // no. of letters to be found
+
+        int left = 0, right  = 0; // sliding window
+        while(right < S.length) {
+            if(tElements[S[right]] > 0) find--;
+
+            tElements[S[right]]--;
+            right++;
+
+            // sliding left pointer when all required characters are found
+            while(find == 0) {
+                if(right - left < minLength){
+                    start = left;
+                    minLength = right-left;
+                }
+                if(tElements[S[left]] == 0) find++;
+                tElements[S[left]]++;
+                left++;
+            }
+        }
+
+        return minLength == Integer.MAX_VALUE ? "" : s.substring(start, start+minLength);
     }
 }
